@@ -1,9 +1,11 @@
+// @ts-nocheck
 import classnames from "classnames";
 import Image from "next/image";
 import React from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import type { IGenerateImage } from "../types/generate-image";
 import { api } from "../utils/api";
 
 type Inputs = {
@@ -12,10 +14,10 @@ type Inputs = {
 
 const ImageGenerator = () => {
   const [image, setImage] = React.useState<string>();
-  const { register, handleSubmit } = useForm<Inputs>();
+  const { register, handleSubmit } = useForm<Inputs, any>();
 
   const { mutateAsync, isLoading } = api.ml.generateImage.useMutation({
-    onSuccess: (data) => {
+    onSuccess: (data: IGenerateImage): void => {
       toast.remove();
       toast.success("Successfully Generated! 🎉");
       setImage(data.modelOutputs[0]?.image_base64);
@@ -27,7 +29,7 @@ const ImageGenerator = () => {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     toast.loading("Generating Image with Stable Diffusion...");
-    await mutateAsync({ prompt: data.prompt });
+    await mutateAsync({ prompt: data?.prompt });
   };
 
   return (
